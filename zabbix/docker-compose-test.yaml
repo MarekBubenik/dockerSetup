@@ -1,0 +1,68 @@
+version: '2'
+
+volumes:
+  zabbix_db:
+  zabbix_server:
+  zabbix_web:
+
+services:
+  zabbix_db:
+    image: mysql:8.0
+    container_name: zabbix_db
+    restart: unless-stopped
+    command: --character-set-server=utf8 
+    command: --collation-server=utf8_bin 
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - /mnt/vault/containers/zabbix/mysql:/var/lib/mysql
+    networks:
+      - proxy
+    environment:
+      - MYSQL_ROOT_PASSWORD=BhNjMk9*-
+      - MYSQL_PASSWORD=BhNjMk9*-
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+
+  zabbix_server:
+    image: zabbix/zabbix-server-mysql:alpine-5.4-latest
+    container_name: zabbix_server
+    restart: unless-stopped
+    ports:
+      - 10051:10051
+    links:
+      - zabbix_db
+    volumes:
+      - /mnt/vault/containers/zabbix/server:/var/www/html
+    networks:
+      - proxy
+    environment:
+      - DB_SERVER_HOST="zabbix_db"
+      - MYSQL_ROOT_PASSWORD=BhNjMk9*-
+      - MYSQL_PASSWORD=BhNjMk9*-
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+
+  zabbix_web:
+    image: zabbix/zabbix-web-nginx-mysql:alpine-5.4-latest
+    container_name: zabbix_web
+    restart: unless-stopped
+    ports:
+      - 7777:8080
+    links:
+      - zabbix_db
+      - zabbix_server
+    volumes:
+      - /mnt/vault/containers/zabbix/web:/config
+    networks:
+      - proxy
+    environment:
+      - ZBX_SERVER_HOST="zabbix_server"
+      - MYSQL_ROOT_PASSWORD=BhNjMk9*-
+      - MYSQL_PASSWORD=BhNjMk9*-
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - PHP_TZ="Europe/Prague"
+
+networks:
+  proxy:
+    external: true

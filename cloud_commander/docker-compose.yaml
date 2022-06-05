@@ -1,0 +1,15 @@
+version: '2'
+services:
+  web:
+    ports:
+      - 8796:8000
+    networks:
+      - proxy
+    volumes:
+      - ~:/root
+      - /:/mnt/fs
+    image: coderaiser/cloudcmd
+
+networks:
+  proxy:
+    external: true

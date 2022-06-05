@@ -1,0 +1,15 @@
+version: '3'
+services:
+  drawio:
+    image: jgraph/drawio
+    container_name: drawio
+    restart: unless-stopped
+    networks:
+      - proxy
+    ports:
+      - 2626:8080
+
+networks:
+  proxy:
+    external: true
+
