@@ -9,6 +9,7 @@ services:
       - ~:/root
       - /:/mnt/fs
     image: coderaiser/cloudcmd
+    restart: unless-stopped
 
 networks:
   proxy:
